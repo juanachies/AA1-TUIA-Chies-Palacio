@@ -4,16 +4,13 @@ import joblib
 import tensorflow as tf
 import os
 
+from cleaner import DataCleaner
+
 # Desactivar logs de tensorflow
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-def cargar_artefactos():
-    model_path = 'red_neuronal.keras'
-    
-    if not os.path.exists(model_path):
-        raise FileNotFoundError(f"El archivo del modelo no se encuentra en: {os.path.abspath(model_path)}")
-        
-    model = tf.keras.models.load_model(model_path)
+def cargar_artefactos():     
+    model = tf.keras.models.load_model('red_neuronal.h5')
     scaler = joblib.load('scaler.joblib')
     cleaner = joblib.load('data_cleaner.joblib')
     model_columns = joblib.load('columnas.joblib')
