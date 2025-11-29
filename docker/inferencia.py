@@ -8,16 +8,21 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 def cargar_artefactos():
-    model = tf.keras.models.load_model('red_neuronal.keras')
+    model_path = 'red_neuronal.keras'
+    
+    if not os.path.exists(model_path):
+        raise FileNotFoundError(f"El archivo del modelo no se encuentra en: {os.path.abspath(model_path)}")
+        
+    model = tf.keras.models.load_model(model_path)
     scaler = joblib.load('scaler.joblib')
-    imputer = joblib.load('imputer.joblib')
+    cleaner = joblib.load('data_cleaner.joblib')
     model_columns = joblib.load('columnas.joblib')
     mapa_regiones = joblib.load('mapa_regiones.joblib')
     
-    return model, scaler, imputer, model_columns, mapa_regiones
+    return model, scaler, cleaner, model_columns, mapa_regiones
 
 
-def preprocesar_datos(df, scaler, imputer, model_columns, mapa_regiones):
+def preprocesar_datos(df, scaler, cleaner, model_columns, mapa_regiones):
     # Agregado de Region
     if 'Location' in df.columns:
         df['Region'] = df['Location'].map(mapa_regiones).fillna(0)
@@ -35,17 +40,17 @@ def preprocesar_datos(df, scaler, imputer, model_columns, mapa_regiones):
     df_processed = df_processed.reindex(columns=model_columns, fill_value=0)
 
     # Imputación
-    data_imputed = imputer.transform(df_processed)
+    data_clear = cleaner.transform(df_processed)
 
-    data_scaled = scaler.transform(data_imputed)
+    data_scaled = scaler.transform(data_clear)
     
     return data_scaled
 
 
 def predict(df):
-    model, scaler, model_columns, mapa_regiones = cargar_artefactos()
+    model, scaler, cleaner, model_columns, mapa_regiones = cargar_artefactos()
 
-    df_procesado = preprocesar_datos(df, scaler, model_columns, mapa_regiones)
+    df_procesado = preprocesar_datos(df, scaler, cleaner, model_columns, mapa_regiones)
 
     predicciones = model.predict(df_procesado, verbose=0)
     y_pred = np.argmax(predicciones, axis=1)
