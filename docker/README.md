@@ -22,7 +22,7 @@ La carpeta `docker` contiene los siguientes archivos clave:
 
 ---
 
-### 🛠️ Instrucciones de Despliegue con Docker
+### Instrucciones de Despliegue con Docker
 
 #### 1. Prerrequisitos
 Asegúrate de tener **Docker Desktop** instalado y en ejecución en tu sistema. 
